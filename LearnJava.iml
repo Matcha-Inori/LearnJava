@@ -7,6 +7,8 @@
       <sourceFolder url="file://$MODULE_DIR$/Test1.7/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/TestConcurrentLinkedQueue/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/TestConcurrentLinkedDeque/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/TestThread/src" isTestSource="false" />
+      <excludeFolder url="file://$MODULE_DIR$/out" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
