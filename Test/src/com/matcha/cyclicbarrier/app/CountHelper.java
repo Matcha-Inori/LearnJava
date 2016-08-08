@@ -2,10 +2,8 @@ package com.matcha.cyclicbarrier.app;
 
 import com.matcha.cyclicbarrier.thread.CountRunnable;
 
-import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.CyclicBarrier;
-import java.util.concurrent.locks.LockSupport;
 
 /**
  * Created by Administrator on 2016/8/8.
