@@ -18,13 +18,13 @@ public class SimulateServlet
     {
         instance = null;
         backStrs = new String[]{
-            "断剑重铸之日,骑士归来之时",
-            "你好",
-            "hello!",
-            "welcome to china!",
-            "我们一起玩吧!",
-            "我的朋友很少",
-            "is that is true?"
+            "断剑重铸之日,骑士归来之时\n",
+            "你好\n",
+            "hello!\n",
+            "welcome to china!\n",
+            "我们一起玩吧!\n",
+            "我的朋友很少\n",
+            "is that is true?\n"
         };
     }
 
@@ -59,11 +59,8 @@ public class SimulateServlet
             InetAddress inetAddress = socket.getInetAddress();
             System.out.println("[" + currentThread.getName() + "] - dispatch request from " + inetAddress);
             bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream(), "UTF-8"));
-            String readStr = null;
-            while((readStr = bufferedReader.readLine()) != null)
-            {
-                System.out.println("[" + currentThread.getName() + "] - read " + readStr);
-            }
+            String readStr = bufferedReader.readLine();
+            System.out.println("[" + currentThread.getName() + "] - read " + readStr);
             bufferedWriter = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), "UTF-8"));
             int backStrIndex = random.nextInt(backStrs.length);
             String writeStr = backStrs[backStrIndex];

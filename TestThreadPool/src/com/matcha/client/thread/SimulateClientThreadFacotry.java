@@ -1,12 +1,12 @@
-package com.matcha.thread;
+package com.matcha.client.thread;
 
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Created by Matcha on 16/8/8.
+ * Created by Administrator on 2016/8/9.
  */
-public class SimulateThreadFactory implements ThreadFactory
+public class SimulateClientThreadFacotry implements ThreadFactory
 {
     private static AtomicInteger nextNumber;
 
@@ -18,7 +18,7 @@ public class SimulateThreadFactory implements ThreadFactory
     @Override
     public Thread newThread(Runnable r)
     {
-        Thread newThread = new Thread(r, "Simulate-Thread-" + nextNumber());
+        Thread newThread = new Thread(r, "Simulate-Client-Thread-" + nextNumber());
         return newThread;
     }
 

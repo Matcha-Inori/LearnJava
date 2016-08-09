@@ -1,8 +1,8 @@
 package com.matcha.run;
 
 import com.matcha.app.People;
-import com.matcha.thread.OfferIntoDequeRunnable;
-import com.matcha.thread.PollFromDequeRunnable;
+import com.matcha.server.thread.OfferIntoDequeRunnable;
+import com.matcha.server.thread.PollFromDequeRunnable;
 
 import java.util.Deque;
 import java.util.concurrent.ConcurrentLinkedDeque;

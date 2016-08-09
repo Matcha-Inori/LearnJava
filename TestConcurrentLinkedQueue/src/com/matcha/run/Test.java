@@ -1,8 +1,8 @@
 package com.matcha.run;
 
 import com.matcha.app.People;
-import com.matcha.thread.OfferRunnable;
-import com.matcha.thread.PollRunnable;
+import com.matcha.server.thread.OfferRunnable;
+import com.matcha.server.thread.PollRunnable;
 
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;

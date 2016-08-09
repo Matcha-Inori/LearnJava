@@ -1,4 +1,4 @@
-package com.matcha.thread;
+package com.matcha.server.thread;
 
 import com.matcha.app.People;
 import com.matcha.data.RandomPeople;
