@@ -9,6 +9,7 @@
       <sourceFolder url="file://$MODULE_DIR$/TestConcurrentLinkedDeque/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/TestThreadPool/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/TestGeneric/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/TestExternalizable/src" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/out" />
     </content>
     <orderEntry type="inheritedJdk" />
