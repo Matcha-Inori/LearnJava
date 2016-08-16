@@ -1,6 +1,8 @@
 package com.matcha.app;
 
 import com.matcha.data.ExternalizableObj;
+import com.matcha.data.NormalSerializable;
+import com.matcha.data.ReplaceAndResolveClass;
 
 import java.io.*;
 
@@ -18,12 +20,16 @@ public class TestExternalizable
                 ObjectInput objectInput = new ObjectInputStream(pipedInputStream)
         )
         {
-            ExternalizableObj externalizableObj = new ExternalizableObj("Matcha", 23, "Bing", "Bang", "Ha");
-            System.out.println("ExternalizableObj is --- " + externalizableObj);
-            objectOutput.writeObject(externalizableObj);
+            ReplaceAndResolveClass replaceAndResolveClass = new ReplaceAndResolveClass("为美好的世界献上祝福");
+            ExternalizableObj externalizableObj = new ExternalizableObj("Matcha", 23, replaceAndResolveClass,
+                    "Bing", "Bang", "Ha");
+            NormalSerializable normalSerializable = new NormalSerializable("Randone", "你看不到这段话的", 100,
+                    externalizableObj, "ABC", "DEF");
+            System.out.println("NormalSerializable is --- " + normalSerializable);
+            objectOutput.writeObject(normalSerializable);
             objectOutput.flush();
-            ExternalizableObj getExternalizableObj = (ExternalizableObj) objectInput.readObject();
-            System.out.println("getExternalizableObj is --- " + getExternalizableObj);
+            NormalSerializable getNormalSerializable = (NormalSerializable) objectInput.readObject();
+            System.out.println("NormalSerializable is --- " + getNormalSerializable);
         }
         catch (IOException | ClassNotFoundException e)
         {

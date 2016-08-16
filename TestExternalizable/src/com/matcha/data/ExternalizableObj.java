@@ -6,27 +6,29 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Created by Matcha on 16/8/14.
  */
 public class ExternalizableObj implements Externalizable
 {
-    private static final long serialVersionUID = 0xFFFF0001;
+    private static final long serialVersionUID = 0xFF01;
 
     private String name;
     private int age;
+    private ReplaceAndResolveClass replaceAndResolveClass;
     private List<String> own;
 
     public ExternalizableObj()
     {
-
     }
 
-    public ExternalizableObj(String name, int age, String...owns)
+    public ExternalizableObj(String name, int age, ReplaceAndResolveClass replaceAndResolveClass, String...owns)
     {
         this.name = name;
         this.age = age;
+        this.replaceAndResolveClass = replaceAndResolveClass;
         this.own = new ArrayList<String>();
         for(String oneOfOwn : owns)
             this.own.add(oneOfOwn);
@@ -37,6 +39,7 @@ public class ExternalizableObj implements Externalizable
     {
         out.writeObject(name);
         out.writeInt(age);
+        out.writeObject(replaceAndResolveClass);
         out.writeInt(own.size());
         for(String ownStr : own)
             out.writeObject(ownStr);
@@ -47,6 +50,8 @@ public class ExternalizableObj implements Externalizable
     {
         this.name = (String) in.readObject();
         this.age = in.readInt();
+//        this.replaceAndResolveClass = (ReplaceAndResolveClass) in.readObject();
+        this.replaceAndResolveClass = new ReplaceAndResolveClass((String) in.readObject());
         int size = in.readInt();
         this.own = new ArrayList<String>(size);
         for(int i = 0;i < size;i++)
@@ -56,6 +61,11 @@ public class ExternalizableObj implements Externalizable
     @Override
     public String toString()
     {
-        return "ExternalizableObj{" + "name='" + name + '\'' + ", age=" + age + ", own=" + own + '}';
+        return "ExternalizableObj{" +
+                "name='" + name + '\'' +
+                ", age=" + age +
+                ", replaceAndResolveClass=" + replaceAndResolveClass +
+                ", own=" + own +
+                '}';
     }
 }
