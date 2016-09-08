@@ -1,7 +1,9 @@
 package com.matcha.app;
 
-import com.matcha.data.*;
-import com.sun.xml.internal.xsom.impl.WildcardImpl;
+import com.matcha.data.ExternalizableObj;
+import com.matcha.data.OtherNormalSerializable;
+import com.matcha.data.ReplaceAndResolveClass;
+import com.matcha.data.SubNormalSerializable;
 
 import java.io.*;
 
