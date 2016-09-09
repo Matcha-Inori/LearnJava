@@ -1,4 +1,4 @@
-package com.matcha.nio;
+package com.matcha.nio.test;
 
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
