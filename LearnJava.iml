@@ -11,6 +11,8 @@
       <sourceFolder url="file://$MODULE_DIR$/TestGeneric/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/TestExternalizable/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/TestNIO/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/NIOAppServer/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/NIOClient/src" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/out" />
     </content>
     <orderEntry type="inheritedJdk" />
