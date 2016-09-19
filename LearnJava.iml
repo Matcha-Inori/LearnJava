@@ -7,7 +7,7 @@
       <sourceFolder url="file://$MODULE_DIR$/Test1.7/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/TestConcurrentLinkedQueue/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/TestConcurrentLinkedDeque/src" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/TestThreadPool/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/TestServer/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/TestGeneric/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/TestExternalizable/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/TestNIO/src" isTestSource="false" />
