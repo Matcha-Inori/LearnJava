@@ -17,8 +17,10 @@ public class StartClient
     public static void main(String[] args)
     {
         SocketAddress socketAddress = new InetSocketAddress("localhost", 8668);
-        try(SocketChannel socketChannel = prepareSocketChannel(socketAddress, false))
+        try(SocketChannel socketChannel = SocketChannel.open())
         {
+            socketChannel.configureBlocking(false);
+            socketChannel.connect(socketAddress);
             int count = 0;
             while(!socketChannel.finishConnect())
             {
@@ -51,13 +53,5 @@ public class StartClient
             e.printStackTrace();
             throw new RuntimeException(e);
         }
-    }
-
-    private static SocketChannel prepareSocketChannel(SocketAddress socketAddress, boolean block) throws IOException
-    {
-        SocketChannel socketChannel = SocketChannel.open();
-        socketChannel.configureBlocking(block);
-        socketChannel.connect(socketAddress);
-        return socketChannel;
     }
 }

@@ -17,8 +17,11 @@ public class StartServer
 
     public static void main(String[] args)
     {
-        try(ServerSocketChannel serverSocketChannel = prepareServerSocketChannel(8668, false))
+        try(ServerSocketChannel serverSocketChannel = ServerSocketChannel.open())
         {
+            serverSocketChannel.configureBlocking(false);
+            ServerSocket serverSocket = serverSocketChannel.socket();
+            serverSocket.bind(new InetSocketAddress(8668));
             SocketChannel socketChannel;
             while(true)
             {
@@ -44,14 +47,5 @@ public class StartServer
         {
             e.printStackTrace();
         }
-    }
-
-    private static ServerSocketChannel prepareServerSocketChannel(int port, boolean block) throws IOException
-    {
-        ServerSocketChannel serverSocketChannel = ServerSocketChannel.open();
-        serverSocketChannel.configureBlocking(block);
-        ServerSocket serverSocket = serverSocketChannel.socket();
-        serverSocket.bind(new InetSocketAddress(port));
-        return serverSocketChannel;
     }
 }

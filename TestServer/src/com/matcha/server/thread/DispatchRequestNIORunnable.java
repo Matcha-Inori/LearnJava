@@ -7,8 +7,6 @@ import java.nio.channels.SelectionKey;
  */
 public class DispatchRequestNIORunnable implements Runnable
 {
-    private SelectionKey
-
     @Override
     public void run()
     {
