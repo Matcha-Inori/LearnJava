@@ -71,6 +71,7 @@ public class ServerThread extends IdedThread
             {
                 serverSocketChannel = (ServerSocketChannel) selectionKey.channel();
                 socketChannel = serverSocketChannel.accept();
+                socketChannel.configureBlocking(false);
                 socketChannel.register(selector, SelectionKey.OP_READ);
                 continue;
             }
@@ -78,13 +79,18 @@ public class ServerThread extends IdedThread
             if(selectionKey.isReadable())
             {
                 socketChannel = (SocketChannel) selectionKey.channel();
-                socketChannel.read(byteBuffer);
+                int readSize = socketChannel.read(byteBuffer);
+                if(readSize == -1)
+                {
+                    socketChannel.close();
+                    continue;
+                }
                 byteBuffer.flip();
                 int remaining = byteBuffer.remaining();
                 clientRequestBytes = new byte[remaining];
                 byteBuffer.get(clientRequestBytes);
                 byteBuffer.clear();
-                System.out.println(new String());
+                System.out.println(new String(clientRequestBytes));
             }
         }
     }
