@@ -114,9 +114,6 @@ public class MatchaNIOServer
 
                     if(selectionKey.isReadable())
                     {
-                        session = (Session) selectionKey.attachment();
-                        socketChannel = selectionKey.channel();
-                        socketChannel.read(methodBuffer);
                     }
                 }
             }

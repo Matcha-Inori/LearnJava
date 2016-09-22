@@ -1,5 +1,7 @@
 package com.matcha.nio.session;
 
+import com.matcha.nio.exception.MatchaUnCheckException;
+
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -33,9 +35,30 @@ public class Session
         this.writeLock = this.readWriteLock.writeLock();
     }
 
-    public Object put(Object key, Object value, long time, TimeUnit timeUnit)
+    public Object put(Object key,
+                      Object value,
+                      long time,
+                      TimeUnit timeUnit)
     {
-        this.writeLock.tryLock(time, timeUnit);
+        boolean locked = false;
+        try
+        {
+            locked = this.writeLock.tryLock(time, timeUnit);
+            if(locked)
+                return sessionInfo.put(key, value);
+            else
+                return null;
+        }
+        catch (InterruptedException e)
+        {
+            e.printStackTrace();
+            throw new MatchaUnCheckException(e);
+        }
+        finally
+        {
+            if(locked)
+                this.writeLock.unlock();
+        }
     }
 
     public Object put(Object key, Object value)
@@ -48,6 +71,54 @@ public class Session
         finally
         {
             this.writeLock.unlock();
+        }
+    }
+
+    public Object get(Object key,
+                      Object defaultValue,
+                      long time,
+                      TimeUnit timeUnit)
+    {
+        boolean locked = false;
+        try
+        {
+            locked = this.readLock.tryLock(time, timeUnit);
+            if(locked)
+            {
+                Object value = sessionInfo.get(key);
+                return value == null ? defaultValue : value;
+            }
+            else
+                return defaultValue;
+        }
+        catch (InterruptedException e)
+        {
+            e.printStackTrace();
+            throw new MatchaUnCheckException(e);
+        }
+        finally
+        {
+            if(locked)
+                this.writeLock.unlock();
+        }
+    }
+
+    public Object get(Object key, long time, TimeUnit timeUnit)
+    {
+        return get(key, null, time, timeUnit);
+    }
+
+    public Object get(Object key, Object defaultValue)
+    {
+        this.readLock.lock();
+        try
+        {
+            Object value = sessionInfo.get(key);
+            return value == null ? defaultValue : value;
+        }
+        finally
+        {
+            this.readLock.unlock();
         }
     }
 
@@ -88,5 +159,25 @@ public class Session
         {
             this.readLock.unlock();
         }
+    }
+
+    public String getUserName()
+    {
+        return userName;
+    }
+
+    public Date getLoginDate()
+    {
+        return loginDate;
+    }
+
+    @Override
+    public String toString()
+    {
+        StringBuffer strBuffer = new StringBuffer();
+        strBuffer.append("Session{").append("sessionId=").append(sessionId).append(", userName='")
+                .append(userName).append('\'').append(", loginDate=").append(loginDate)
+                .append(", sessionInfo=").append(sessionInfo).append('}');
+        return strBuffer.toString();
     }
 }
