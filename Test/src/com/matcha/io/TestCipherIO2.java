@@ -1,5 +1,7 @@
 package com.matcha.io;
 
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+
 import javax.crypto.*;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -14,22 +16,24 @@ public class TestCipherIO2
 {
     public static void main(String[] args)
     {
+        Security.addProvider(new BouncyCastleProvider());
+
         Cipher cipherEncrypt = null;
         Cipher cipherDecrypt = null;
         Charset charset = null;
         try
         {
             charset = Charset.forName("UTF-8");
-            KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
+            KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA", "BC");
             KeyPair keyPair = keyPairGenerator.generateKeyPair();
             PrivateKey privateKey = keyPair.getPrivate();
             PublicKey publicKey = keyPair.getPublic();
-            cipherEncrypt = Cipher.getInstance("RSA");
+            cipherEncrypt = Cipher.getInstance("RSA", "BC");
             cipherEncrypt.init(Cipher.ENCRYPT_MODE, privateKey);
-            cipherDecrypt = Cipher.getInstance("RSA");
+            cipherDecrypt = Cipher.getInstance("RSA", "BC");
             cipherDecrypt.init(Cipher.DECRYPT_MODE, publicKey);
         }
-        catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException e)
+        catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | NoSuchProviderException e)
         {
             e.printStackTrace();
             throw new RuntimeException(e);

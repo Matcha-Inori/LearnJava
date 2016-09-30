@@ -113,6 +113,7 @@ public class TestBufferedIO
                 }
                 mappedByteBuffer.put(writeBytes);
             }
+            file.deleteOnExit();
         }
         catch (IOException e)
         {
