@@ -1,8 +1,12 @@
 package com.matcha.io.app;
 
+import sun.nio.ch.FileChannelImpl;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 
@@ -17,7 +21,7 @@ public abstract class ReadTest
     protected int size;
     protected int bufferedSize;
 
-    protected abstract int read();
+    protected abstract long read();
 
     protected ReadTest(String testName,
                        int count,
@@ -38,7 +42,10 @@ public abstract class ReadTest
         ReadTestResult readTestResult = new ReadTestResult(testName);
         for(int i = 0;i < count;i++)
         {
-            readTestResult.addTime(read());
+            System.out.println(testName + " - " + (i + 1) + "th read start");
+            long costTime = read();
+            readTestResult.addTime(costTime);
+            System.out.println(testName + " - " + (i + 1) + "th read finish and cost - " + costTime);
         }
         return readTestResult;
     }
@@ -47,7 +54,7 @@ public abstract class ReadTest
     {
         File file = new File(filePath);
         if (file.exists() && file.isFile())
-            return;
+            file.delete();
 
         try(
                 RandomAccessFile randomAccessFile = new RandomAccessFile(filePath, "rw");
@@ -64,13 +71,17 @@ public abstract class ReadTest
                     writeBytes[index] = (byte) index;
                 mappedByteBuffer.put(writeBytes);
             }
-            file.deleteOnExit();
+
+            Method unmapMethod = FileChannelImpl.class.getDeclaredMethod("unmap", MappedByteBuffer.class);
+            unmapMethod.setAccessible(true);
+            unmapMethod.invoke(fileChannel, mappedByteBuffer);
         }
-        catch (IOException e)
+        catch (IOException | NoSuchMethodException | InvocationTargetException | IllegalAccessException e)
         {
             e.printStackTrace();
             throw new RuntimeException(e);
         }
+        file.deleteOnExit();
     }
 
     public String getTestName()

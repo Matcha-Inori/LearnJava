@@ -31,7 +31,7 @@ public class ReadTestResult
         {
             time = timeList.get(i);
             allTime += time;
-            System.out.println("the " + i + "th test cost - " + time);
+            System.out.println("the " + (i + 1) + "th test cost - " + time);
         }
         long average = allTime / timeList.size();
         System.out.println("all cost " + allTime);
