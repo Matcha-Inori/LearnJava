@@ -44,6 +44,45 @@ public class TestAddressAndURL
             URI specialURI3 = new URI(null, null, "a/b/c/d/f", "fragment");
             System.out.println(specialURI3);
 
+            URI specialURI4 =
+                    new URI("http://www.baidu.com/abc/%CB%9C%C2%A5%C2%A8%C6%92%E2%88%82%E2%88%82%E2%88%82?name=1&ss=2#fff");
+            System.out.println(specialURI4);
+            System.out.println(specialURI4.toASCIIString());
+            System.out.println("specialURI4.getAuthority() - " + specialURI4.getAuthority());
+            System.out.println("specialURI4.getFragment() - " + specialURI4.getFragment());
+            System.out.println("specialURI4.getPath() - " + specialURI4.getPath());
+            System.out.println("specialURI4.getQuery() - " + specialURI4.getQuery());
+            System.out.println("specialURI4.getScheme() - " + specialURI4.getScheme());
+            System.out.println("specialURI4.getSchemeSpecificPart() - " + specialURI4.getSchemeSpecificPart());
+
+            System.out.println("specialURI4.getRawAuthority() - " + specialURI4.getRawAuthority());
+            System.out.println("specialURI4.getRawFragment() - " + specialURI4.getRawFragment());
+            System.out.println("specialURI4.getRawPath() - " + specialURI4.getRawPath());
+            System.out.println("specialURI4.getRawQuery() - " + specialURI4.getRawQuery());
+            System.out.println("specialURI4.getRawSchemeSpecificPart() - " + specialURI4.getRawSchemeSpecificPart());
+
+            URL specialURL_4 = specialURI4.toURL();
+            System.out.println(specialURL_4);
+
+            URI specialURI5 = new URI("http://www.baidu.com/abc/˜¥¨ƒ∂∂∂?name=1&ss=2#fff");
+            System.out.println(specialURI5);
+            System.out.println(specialURI5.toASCIIString());
+            System.out.println("specialURI5.getAuthority() - " + specialURI5.getAuthority());
+            System.out.println("specialURI5.getFragment() - " + specialURI5.getFragment());
+            System.out.println("specialURI5.getPath() - " + specialURI5.getPath());
+            System.out.println("specialURI5.getQuery() - " + specialURI5.getQuery());
+            System.out.println("specialURI5.getScheme() - " + specialURI5.getScheme());
+            System.out.println("specialURI5.getSchemeSpecificPart() - " + specialURI5.getSchemeSpecificPart());
+
+            System.out.println("specialURI5.getRawAuthority() - " + specialURI5.getRawAuthority());
+            System.out.println("specialURI5.getRawFragment() - " + specialURI5.getRawFragment());
+            System.out.println("specialURI5.getRawPath() - " + specialURI5.getRawPath());
+            System.out.println("specialURI5.getRawQuery() - " + specialURI5.getRawQuery());
+            System.out.println("specialURI5.getRawSchemeSpecificPart() - " + specialURI5.getRawSchemeSpecificPart());
+
+            URL specialURL_5 = specialURI5.toURL();
+            System.out.println(specialURL_5);
+
             //exception : java.lang.IllegalArgumentException: URI is not absolute
 //            URL specialURL = specialURI3.toURL();
 //            System.out.println(specialURL);
