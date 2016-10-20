@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>test http response length</title>
+        <script type="text/javascript" src="http://localhost:8080/js/dependence/jquery-3.1.1.js"></script>
+        <script type="text/javascript">
+            $(function ()
+            {
+                $("#btnSend").click(function(){
+                    $.post(
+                            "Length",
+                            {},
+                            function(data)
+                            {
+                                console.log("test result: " + data);
+                            }
+                    );
+                });
+            });
+        </script>
+    </head>
+    <body>
+        <button id="btnSend">send post request</button>
+    </body>
+</html>
