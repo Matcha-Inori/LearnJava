@@ -2,6 +2,9 @@ package com.matcha.net;
 
 import java.io.*;
 import java.net.*;
+import java.nio.ByteBuffer;
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
 import java.nio.charset.Charset;
 
 /**
@@ -108,19 +111,23 @@ public class TestAddressAndURL
         }
 
         HttpURLConnection urlConnection = null;
-        InputStream inputStream = null;
-        InputStreamReader inputStreamReader = null;
-        BufferedReader bufferedReader = null;
-        String str = null;
         try
         {
             urlConnection = (HttpURLConnection) baiduURL.openConnection();
             urlConnection.connect();
-            inputStream = urlConnection.getInputStream();
-            inputStreamReader = new InputStreamReader(inputStream, Charset.forName("UTF-8"));
-            bufferedReader = new BufferedReader(inputStreamReader);
-            while((str = bufferedReader.readLine()) != null)
-                System.out.println(str);
+            int contentLength = urlConnection.getContentLength();
+            try(
+                    InputStream inputStream = urlConnection.getInputStream();
+                    ReadableByteChannel readableByteChannel = Channels.newChannel(inputStream)
+            )
+            {
+                ByteBuffer byteBuffer = ByteBuffer.allocateDirect(contentLength);
+                byte[] strByte = new byte[contentLength];
+                readableByteChannel.read(byteBuffer);
+                byteBuffer.flip();
+                byteBuffer.get(strByte);
+                System.out.println(new String(strByte));
+            }
         }
         catch (IOException e)
         {
@@ -130,36 +137,6 @@ public class TestAddressAndURL
         {
             if(urlConnection != null)
                 urlConnection.disconnect();
-
-            try
-            {
-                if (inputStream != null)
-                    inputStream.close();
-            }
-            catch (IOException e)
-            {
-                e.printStackTrace();
-            }
-
-            try
-            {
-                if (inputStreamReader != null)
-                    inputStreamReader.close();
-            }
-            catch (IOException e)
-            {
-                e.printStackTrace();
-            }
-
-            try
-            {
-                if (bufferedReader != null)
-                    bufferedReader.close();
-            }
-            catch (IOException e)
-            {
-                e.printStackTrace();
-            }
         }
     }
 }
