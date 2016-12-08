@@ -114,6 +114,7 @@ public class TestAddressAndURL
         try
         {
             urlConnection = (HttpURLConnection) baiduURL.openConnection();
+            urlConnection.setDoOutput(false);
             urlConnection.connect();
             int contentLength = urlConnection.getContentLength();
             try(
