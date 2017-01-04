@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<matcha:notes xmlns:matcha="http://www.matcha.com"
+              xmlns:imp="http://www.matcha.com/import/">
+    <matcha:note id="note1">
+        <matcha:author>Matcha</matcha:author>
+        <matcha:to>Tom</matcha:to>
+        <matcha:time>09:00</matcha:time>
+        <matcha:head>hi</matcha:head>
+        <matcha:body>please call me later</matcha:body>
+    </matcha:note>
+    <matcha:note id="note2">
+        <matcha:author>Tom</matcha:author>
+        <matcha:to>Matcha</matcha:to>
+        <matcha:time>09:30</matcha:time>
+        <matcha:head>ok</matcha:head>
+        <matcha:body>ok</matcha:body>
+        <imp:import id="import_id_1" name="import1">
+            <imp:location>test</imp:location>
+            <imp:name>testName</imp:name>
+        </imp:import>
+        <imp:import id="import_id_2" name="import2">
+            <imp:location>location</imp:location>
+        </imp:import>
+    </matcha:note>
+</matcha:notes>

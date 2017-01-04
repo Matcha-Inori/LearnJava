@@ -1,0 +1,22 @@
+grant codebase "${LearnJavaHome}/Test/src/com/matcha/security/context/test/package3" {
+    permission com.matcha.security.context.perm.MatchaPermission, "read, write";
+};
+
+grant {
+    permission java.io.FilePermission "/*", "read, write";
+    permission java.io.FilePermission "resource/*", "read, write, delete";
+
+    permission java.security.SecurityPermission "insertProvider";
+    permission java.security.SecurityPermission "insertProvider.BC";
+    permission java.security.SecurityPermission "putProviderProperty.BC";
+
+    permission java.util.PropertyPermission "java.security.auth.login.config", "write";
+
+    permission javax.security.auth.AuthPermission "createLoginContext.Matcha";
+    permission javax.security.auth.AuthPermission "modifyPrincipals";
+
+    permission java.lang.RuntimePermission "modifyThread";
+    permission java.lang.RuntimePermission "modifyThreadGroup";
+
+    permission java.lang.RuntimePermission "exitVM";
+};
