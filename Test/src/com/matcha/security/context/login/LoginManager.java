@@ -6,6 +6,7 @@ import com.matcha.security.context.login.callback.MatchaCallbackHandler;
 import javax.security.auth.Subject;
 import javax.security.auth.login.LoginContext;
 import javax.security.auth.login.LoginException;
+import java.security.PrivilegedAction;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -75,5 +76,15 @@ public class LoginManager
         }
         loginInfos.remove(sessionId);
         ContextManager.getInstance().removeContext(sessionId);
+    }
+
+    public <T> T doAs(String sessionId, PrivilegedAction<T> privilegedAction)
+    {
+        Object[] loginInfo = loginInfos.get(sessionId);
+        if(loginInfo == null)
+            return null;
+
+        Subject subject = (Subject) loginInfo[0];
+        return Subject.doAs(subject, privilegedAction);
     }
 }

@@ -1,6 +1,15 @@
-grant codebase "${LearnJavaHome}/Test/src/com/matcha/security/context/test/package3" {
-    permission com.matcha.security.context.perm.MatchaPermission, "read, write";
+grant codebase "file://${user.dir}/OtherPermJar/MatchaC.jar" {
+    permission com.matcha.security.context.perm.MatchaPermission "matchaName1", "read";
 };
+
+grant codebase "file://${user.dir}/OtherPermJar/MatchaD.jar" "administrator" {
+    permission com.matcha.security.context.perm.MatchaPermission "matchaName2", "read, write";
+};
+
+grant codebase "file://${user.dir}/OtherPermJar/MatchaD.jar" "user" {
+    permission com.matcha.security.context.perm.MatchaPermission "matchaName2", "read";
+};
+
 
 grant {
     permission java.io.FilePermission "/*", "read, write";

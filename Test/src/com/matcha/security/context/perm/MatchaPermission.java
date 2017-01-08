@@ -1,5 +1,6 @@
 package com.matcha.security.context.perm;
 
+import javax.swing.*;
 import java.security.Permission;
 
 /**
@@ -7,11 +8,36 @@ import java.security.Permission;
  */
 public class MatchaPermission extends Permission
 {
+    private enum ActionEnum
+    {
+        READ("read", 0x0001),
+        WRITE("write", 0x0002);
+
+        private String key;
+        private int position;
+
+        ActionEnum(String key, int position)
+        {
+            this.key = key;
+            this.position = position;
+        }
+
+        public String getKey()
+        {
+            return key;
+        }
+
+        public int getPosition()
+        {
+            return position;
+        }
+    }
+
     private String action;
 
-    public MatchaPermission(String action)
+    public MatchaPermission(String name, String action)
     {
-        super(MatchaPermission.class.getSimpleName());
+        super(name);
         this.action = action;
     }
 
@@ -20,7 +46,25 @@ public class MatchaPermission extends Permission
     {
         if(!MatchaPermission.class.isInstance(permission))
             return false;
-        return this.action.equals(permission.getActions());
+        int permissionPosition = getPosition(permission.getActions());
+        int position = this.getPosition(this.action.toUpperCase());
+        return (position & permissionPosition) == permissionPosition;
+    }
+
+    private int getPosition(String actionStr)
+    {
+        String[] actions = actionStr.split(",");
+        int position = 0;
+        ActionEnum actionEnum;
+        for(String action : actions)
+        {
+            action = action.trim();
+            if(action.length() == 0)
+                continue;
+            actionEnum = ActionEnum.valueOf(action.toUpperCase());
+            position |= actionEnum.getPosition();
+        }
+        return position;
     }
 
     @Override

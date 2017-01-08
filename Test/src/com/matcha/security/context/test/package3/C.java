@@ -1,5 +1,6 @@
 package com.matcha.security.context.test.package3;
 
+import com.matcha.security.context.perm.MatchaPermission;
 import com.matcha.security.context.test.package4.D;
 
 import java.security.AccessController;
@@ -12,15 +13,8 @@ public class C
 {
     public void methodC()
     {
-        AccessController.doPrivileged(new PrivilegedAction<Void>()
-        {
-            @Override
-            public Void run()
-            {
-                D d = new D();
-                d.methodD();
-                return null;
-            }
-        });
+        D d = new D();
+        d.methodD();
+        AccessController.checkPermission(new MatchaPermission("name1", "false"));
     }
 }
