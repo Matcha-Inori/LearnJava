@@ -15,24 +15,15 @@ public class D
 {
     public void methodD()
     {
-
-        AccessController.doPrivileged(new PrivilegedAction<Void>()
+        LoginManager loginManager = LoginManager.getInstance();
+        loginManager.doAsPrivileged(LoginThread.getSessionId(), new PrivilegedAction<Void>()
         {
             @Override
             public Void run()
             {
-                AccessController.checkPermission(new MatchaPermission("name2", "write"));
-                return null;
-            }
-        });
-        AccessController.checkPermission(new MatchaPermission("name3", "read"));
-
-        LoginManager.getInstance().doAs(LoginThread.getSessionId(), new PrivilegedAction<Void>()
-        {
-            @Override
-            public Void run()
-            {
-                AccessController.checkPermission(new MatchaPermission("name2", "read, write"));
+                AccessController.checkPermission(new MatchaPermission("name2", "read"));
+                AccessController.checkPermission(new MatchaPermission("name3", "write"));
+                AccessController.checkPermission(new MatchaPermission("name4", "read, write"));
                 return null;
             }
         });

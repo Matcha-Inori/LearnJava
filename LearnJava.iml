@@ -37,7 +37,9 @@
           <root url="file://$MODULE_DIR$/OtherPermJar" />
         </CLASSES>
         <JAVADOC />
-        <SOURCES />
+        <SOURCES>
+          <root url="file://$MODULE_DIR$/Test/src" />
+        </SOURCES>
         <jarDirectory url="file://$MODULE_DIR$/OtherPermJar" recursive="false" />
       </library>
     </orderEntry>

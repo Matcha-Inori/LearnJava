@@ -6,6 +6,7 @@ import com.matcha.security.context.login.callback.MatchaCallbackHandler;
 import javax.security.auth.Subject;
 import javax.security.auth.login.LoginContext;
 import javax.security.auth.login.LoginException;
+import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.HashMap;
 import java.util.Map;
@@ -80,11 +81,23 @@ public class LoginManager
 
     public <T> T doAs(String sessionId, PrivilegedAction<T> privilegedAction)
     {
+        Subject subject = getSubject(sessionId);
+        return Subject.doAs(subject, privilegedAction);
+    }
+
+    public <T> T doAsPrivileged(String sessionId, PrivilegedAction<T> privilegedAction)
+    {
+        Subject subject = getSubject(sessionId);
+        return Subject.doAsPrivileged(subject, privilegedAction, null/*AccessController.getContext()*/);
+    }
+
+    private Subject getSubject(String sessionId)
+    {
         Object[] loginInfo = loginInfos.get(sessionId);
         if(loginInfo == null)
             return null;
 
         Subject subject = (Subject) loginInfo[0];
-        return Subject.doAs(subject, privilegedAction);
+        return subject;
     }
 }
