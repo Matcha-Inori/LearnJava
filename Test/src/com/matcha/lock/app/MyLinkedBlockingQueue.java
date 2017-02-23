@@ -1,6 +1,7 @@
 package com.matcha.lock.app;
 
 import java.lang.reflect.Array;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
@@ -135,31 +136,98 @@ public class MyLinkedBlockingQueue<ELEMENT> implements BlockingQueue<ELEMENT>
     @Override
     public int remainingCapacity()
     {
-        return 0;
+        lock.lock();
+        try
+        {
+            int elementCount = insertIndex - startIndex;
+            return queueSize - elementCount;
+        }
+        finally
+        {
+            lock.unlock();
+        }
     }
 
     @Override
     public boolean remove(Object o)
     {
-
+        lock.lock();
+        try
+        {
+            int objIndex = -1;
+            for(int index = startIndex;index < insertIndex;index++)
+            {
+                if(elements[index] == o || elements[index].equals(o))
+                    objIndex = index;
+            }
+            if(objIndex < 0)
+                return false;
+            int srcPos = objIndex + 1;
+            int length = insertIndex - objIndex;
+            System.arraycopy(elements, srcPos, elements, objIndex, length);
+            insertIndex--;
+            return true;
+        }
+        finally
+        {
+            lock.unlock();
+        }
     }
 
     @Override
     public boolean contains(Object o)
     {
-        return false;
+        lock.lock();
+        try
+        {
+            for(ELEMENT element : elements)
+                if(element == o || element.equals(o)) return true;
+            return false;
+        }
+        finally
+        {
+            lock.unlock();
+        }
     }
 
     @Override
     public int drainTo(Collection<? super ELEMENT> c)
     {
-        return 0;
+        lock.lock();
+        try
+        {
+            if(isEmpty())
+                return 0;
+            for(int index = startIndex;index < insertIndex;index++)
+                c.add(elements[index]);
+            int count = size();
+            startIndex = insertIndex;
+            return count;
+        }
+        finally
+        {
+            lock.unlock();
+        }
     }
 
     @Override
     public int drainTo(Collection<? super ELEMENT> c, int maxElements)
     {
-        return 0;
+        lock.lock();
+        try
+        {
+            if(isEmpty())
+                return 0;
+            int size = this.size();
+            int count = Integer.min(size, maxElements);
+            for(int index = 0;index < count;index++)
+                c.add(elements[startIndex + index]);
+            return count;
+        }
+        finally
+        {
+            lock.unlock();
+        }
     }
 
     @Override
@@ -246,13 +314,30 @@ public class MyLinkedBlockingQueue<ELEMENT> implements BlockingQueue<ELEMENT>
     @Override
     public Object[] toArray()
     {
-        return new Object[0];
+        lock.lock();
+        try
+        {
+            return Arrays.copyOfRange(elements, startIndex, insertIndex);
+        }
+        finally
+        {
+            lock.unlock();
+        }
     }
 
     @Override
     public <T> T[] toArray(T[] a)
     {
-        return null;
+        lock.lock();
+        try
+        {
+            a.getClass().asSubclass(ELEMENT)
+            return Arrays.copyOfRange(elements, startIndex, insertIndex, a.getClass());
+        }
+        finally
+        {
+            lock.unlock();
+        }
     }
 
     @Override

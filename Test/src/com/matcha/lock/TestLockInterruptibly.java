@@ -53,7 +53,24 @@ public class TestLockInterruptibly
                 try
                 {
                     countDownLatch.await();
+                    lock.lock();
+                }
+                catch (InterruptedException e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        }, "MatchaOtherGetLockThread");
+        Thread thread4 = new Thread(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                try
+                {
+                    countDownLatch.await();
                     thread2.interrupt();
+                    thread3.interrupt();
                 }
                 catch (InterruptedException e)
                 {
@@ -64,6 +81,7 @@ public class TestLockInterruptibly
         thread1.start();
         thread2.start();
         thread3.start();
+        thread4.start();
         countDownLatch.countDown();
     }
 }

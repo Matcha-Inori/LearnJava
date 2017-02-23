@@ -10,7 +10,7 @@ public class LockTestClass2
 {
     public static void main(String[] args)
     {
-        int count = 6;
+        int count = 8;
         Thread thread = null;
         IThreadFactory iThreadFactory = DefaultThreadFacotry.getInstance();
         for(int i = 0;i < count;i++)
