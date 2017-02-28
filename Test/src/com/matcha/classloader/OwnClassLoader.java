@@ -1,29 +1,44 @@
 package com.matcha.classloader;
 
+import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.lang.ref.Reference;
+import java.lang.ref.ReferenceQueue;
+import java.lang.ref.SoftReference;
+import java.lang.ref.WeakReference;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
+import java.nio.file.*;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Created by Matcha on 2016/11/28.
  */
-public class OwnClassLoader extends ClassLoader
+public class OwnClassLoader extends ClassLoader implements Closeable
 {
-    private static AtomicInteger nextId;
+    private static final AtomicInteger nextId;
+    private static final Map<OwnClassLoader, Reference<OwnClassLoader>> weakReferenceMap;
+    private static final ReferenceQueue<OwnClassLoader> weakReferenceQueue;
 
     static
     {
         nextId = new AtomicInteger(1);
+        weakReferenceMap = new ConcurrentHashMap<>(10);
+        weakReferenceQueue = new ReferenceQueue<>();
     }
 
     private int id;
-    private URI baseURI;
+    private FileSystem fileSystem;
+    private Path basePath;
 
     public OwnClassLoader(ClassLoader parent)
     {
@@ -43,7 +58,11 @@ public class OwnClassLoader extends ClassLoader
             id = nextId.getAndIncrement();
             ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
             URL baseURL = classLoader.getResource(".");
-            baseURI = baseURL.toURI().resolve("../../out/production/OtherModule/");
+            URI baseURI = baseURL.toURI().resolve("../../out/production/OtherModule/");
+            basePath = Paths.get(baseURI);
+            fileSystem = FileSystems.getDefault();
+            Reference<OwnClassLoader> reference = new WeakReference<>(this, weakReferenceQueue);
+            weakReferenceMap.put(this, reference);
         }
         catch (URISyntaxException e)
         {
@@ -55,33 +74,67 @@ public class OwnClassLoader extends ClassLoader
     @Override
     protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException
     {
-        System.out.println("Own Class Loader loadClass - name " + name);
-        Class<?> theClass = null;
-
-        String classPath = name.replace('.', '/') + ".class";
-        URI classURI = baseURI.resolve(classPath);
-
-        File classFile = new File(classURI);
-        if(!classFile.exists())
-            return super.loadClass(name, resolve);
-
-        try(
-                RandomAccessFile randomAccessFile = new RandomAccessFile(new File(classURI), "r");
-                FileChannel fileChannel = randomAccessFile.getChannel();
-        )
+        try
         {
-            ByteBuffer byteBuffer = ByteBuffer.allocateDirect((int) fileChannel.size());
-            fileChannel.read(byteBuffer);
-            byteBuffer.flip();
-            byte[] bytes = new byte[byteBuffer.remaining()];
-            byteBuffer.get(bytes);
-            theClass = defineClass(name, bytes, 0, bytes.length);
+            System.out.println("Own Class Loader loadClass - name " + name);
+            String classPathStr = name.replace('.', '/') + ".class";
+            Path classPath = basePath.resolve(classPathStr);
+            if(Files.notExists(classPath))
+                return super.loadClass(name, resolve);
+            byte[] classBytes = Files.readAllBytes(classPath);
+            Class<?> theClass = this.defineClass(name, classBytes, 0, classBytes.length);
+            return theClass == null ? super.loadClass(name, resolve) : theClass;
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public void close() throws IOException
+    {
+        System.out.println("OwnClassLoader close");
+        try
+        {
+            if(fileSystem != null)
+                fileSystem.close();
         }
         catch (IOException e)
         {
             e.printStackTrace();
         }
+    }
 
-        return theClass == null ? super.loadClass(name, resolve) : theClass;
+    static
+    {
+        Thread cleanerThread = new Thread(new Cleaner(), "CleanerThread");
+        cleanerThread.setDaemon(true);
+        cleanerThread.start();
+    }
+
+    private static class Cleaner implements Runnable
+    {
+        @Override
+        public void run()
+        {
+            Reference<? extends OwnClassLoader> reference;
+            OwnClassLoader ownClassLoader;
+            while(true)
+            {
+                try
+                {
+                    reference = weakReferenceQueue.remove();
+                    ownClassLoader = reference.get();
+                    weakReferenceMap.remove(ownClassLoader);
+                    ownClassLoader.close();
+                }
+                catch (InterruptedException | IOException e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 }
