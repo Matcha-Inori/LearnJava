@@ -1,5 +1,7 @@
 package com.matcha.classloader;
 
+import java.io.IOException;
+
 /**
  * Created by Matcha on 2016/11/28.
  */
@@ -27,16 +29,15 @@ public class TestClassLoader
         thread1.setContextClassLoader(new OwnClassLoader());
         thread1.start();*/
 
-        try
+        try(OwnClassLoader classLoader = new OwnClassLoader())
         {
-            ClassLoader classLoader = new OwnClassLoader();
             Class<?> thread = classLoader.loadClass("com.matcha.classloader.thread.TestRunnable");
             Runnable runnable = (Runnable) thread.newInstance();
             Thread thread1 = new Thread(runnable, "thread1");
             thread1.setContextClassLoader(classLoader);
             thread1.start();
         }
-        catch (ClassNotFoundException | IllegalAccessException | InstantiationException e)
+        catch (ClassNotFoundException | IllegalAccessException | InstantiationException | IOException e)
         {
             e.printStackTrace();
             throw new RuntimeException(e);
