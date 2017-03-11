@@ -2,9 +2,7 @@ package com.matcha.dynamic;
 
 import com.matcha.dynamic.app.People;
 
-import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodHandles;
-import java.lang.invoke.MethodType;
+import java.lang.invoke.*;
 
 /**
  * Created by Administrator on 2017/3/1.
@@ -28,6 +26,10 @@ public class TestDynamic2
             System.out.println(String.format("%s's age is %d", people.toString(), getAgeMethodHandle.invoke()));
             System.out.println(String.format("%s's number is %d", people.toString(), getNumberMethodHandle.invoke()));
             setNumberMethodHandle.invokeExact(10);
+            System.out.println(String.format("%s's number is %d", people.toString(), getNumberMethodHandle.invoke()));
+            CallSite setNumberCallSite = new ConstantCallSite(setNumberMethodHandle);
+            MethodHandle setNumberDynamicInvoker = setNumberCallSite.dynamicInvoker();
+            setNumberDynamicInvoker.invoke(20);
             System.out.println(String.format("%s's number is %d", people.toString(), getNumberMethodHandle.invoke()));
         }
         catch (Throwable throwable)

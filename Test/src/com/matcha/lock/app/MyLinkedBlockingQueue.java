@@ -328,16 +328,7 @@ public class MyLinkedBlockingQueue<ELEMENT> implements BlockingQueue<ELEMENT>
     @Override
     public <T> T[] toArray(T[] a)
     {
-        lock.lock();
-        try
-        {
-            a.getClass().asSubclass(ELEMENT)
-            return Arrays.copyOfRange(elements, startIndex, insertIndex, a.getClass());
-        }
-        finally
-        {
-            lock.unlock();
-        }
+        return null;
     }
 
     @Override

@@ -36,5 +36,9 @@ public class TestArray
 
 //        Integer[] newIntegerArray = (Integer[]) Array.newInstance(Integer.class, intArray.length);
 //        System.arraycopy(newIntegerArray, 0, intArray, 0, intArray.length);
+
+        System.out.println(int.class.getClassLoader());
+        System.out.println(int[].class.getClassLoader());
+        System.out.println(Integer[].class.getClassLoader());
     }
 }
