@@ -41,4 +41,13 @@ public class TestHashObject
     {
         return name == null ? otherName == null : name.equals(otherName);
     }
+
+    @Override
+    public String toString()
+    {
+        return "TestHashObject{" +
+                "age=" + age +
+                ", name='" + name + '\'' +
+                '}';
+    }
 }
