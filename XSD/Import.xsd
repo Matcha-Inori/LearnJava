@@ -3,11 +3,11 @@
            targetNamespace="http://www.matcha.com/import/">
     <xs:element name="import" type="import_type"/>
     <xs:complexType name="import_type">
-        <xs:attribute name="id" type="xs:ID" use="required"/>
-        <xs:attribute name="name" type="xs:string" use="required"/>
         <xs:sequence>
             <xs:element name="location" type="xs:string" minOccurs="1"/>
             <xs:element name="name" type="xs:string"/>
         </xs:sequence>
+        <xs:attribute name="id" type="xs:ID" use="required"/>
+        <xs:attribute name="name" type="xs:string" use="required"/>
     </xs:complexType>
 </xs:schema>

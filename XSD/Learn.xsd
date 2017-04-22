@@ -4,13 +4,12 @@
            elementFormDefault="qualified">
     <xs:element name="notes">
         <xs:complexType>
-            <xs:sequence>
+            <xs:sequence maxOccurs="unbounded">
                 <xs:element name="note" type="note_type"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
     <xs:complexType name="note_type">
-        <xs:attribute name="id" type="xs:ID" use="required"/>
         <xs:sequence>
             <xs:element name="author" type="xs:string"/>
             <xs:element name="to" type="xs:string"/>
@@ -19,5 +18,6 @@
             <xs:element name="body" type="xs:string"/>
             <xs:any minOccurs="0"/>
         </xs:sequence>
+        <xs:attribute name="id" type="xs:ID" use="required"/>
     </xs:complexType>
 </xs:schema>
