@@ -1,5 +1,7 @@
 package com.matcha.testclass;
 
+import com.matcha.testclass.app.A;
+
 /**
  * Created by Administrator on 2017/3/2.
  */
@@ -40,5 +42,6 @@ public class TestArray
         System.out.println(int.class.getClassLoader());
         System.out.println(int[].class.getClassLoader());
         System.out.println(Integer[].class.getClassLoader());
+        System.out.println(A[].class.getClassLoader());
     }
 }
