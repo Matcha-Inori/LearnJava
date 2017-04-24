@@ -26,18 +26,19 @@ public class TestClassLoader
                 }
             }
         }, "thread1");
-        thread1.setContextClassLoader(new OwnClassLoader());
+        thread1.setContextClassLoader(new OwnClassLoader2());
         thread1.start();*/
 
-        try(OwnClassLoader classLoader = new OwnClassLoader())
+        try
         {
+            OwnClassLoader classLoader = new OwnClassLoader();
             Class<?> thread = classLoader.loadClass("com.matcha.classloader.thread.TestRunnable");
             Runnable runnable = (Runnable) thread.newInstance();
             Thread thread1 = new Thread(runnable, "thread1");
             thread1.setContextClassLoader(classLoader);
             thread1.start();
         }
-        catch (ClassNotFoundException | IllegalAccessException | InstantiationException | IOException e)
+        catch (ClassNotFoundException | IllegalAccessException | InstantiationException e)
         {
             e.printStackTrace();
             throw new RuntimeException(e);
