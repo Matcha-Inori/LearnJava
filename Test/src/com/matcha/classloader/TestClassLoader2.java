@@ -13,8 +13,9 @@ public class TestClassLoader2
 {
     public static void main(String[] args)
     {
-        try(OwnClassLoader classLoader = new OwnClassLoader())
+        try
         {
+            OwnClassLoader classLoader = new OwnClassLoader();
             Class<?> testClass = classLoader.loadClass("com.matcha.classloader.test.TestImpl");
             Constructor<?> testClassConstructor = testClass.getConstructor(String.class);
             //这里会抛出ClassCastException
@@ -29,15 +30,15 @@ public class TestClassLoader2
                 NoSuchMethodException |
                 IllegalAccessException |
                 InstantiationException |
-                InvocationTargetException |
-                IOException e)
+                InvocationTargetException e)
         {
             e.printStackTrace();
             throw new RuntimeException(e);
         }
 
-        try(OwnClassLoader classLoader = new OwnClassLoader())
+        try
         {
+            OwnClassLoader classLoader = new OwnClassLoader();
             Class<?> threadClass = classLoader.loadClass("com.matcha.classloader.thread.TestRunnable2");
             Runnable runnable = (Runnable) threadClass.newInstance();
             Thread thread1 = new Thread(runnable, "thread1");
@@ -46,8 +47,7 @@ public class TestClassLoader2
         }
         catch (ClassNotFoundException |
                 IllegalAccessException |
-                InstantiationException |
-                IOException e)
+                InstantiationException e)
         {
             e.printStackTrace();
             throw new RuntimeException(e);

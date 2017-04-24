@@ -23,21 +23,16 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  * Created by Matcha on 2016/11/28.
  */
-public class OwnClassLoader extends ClassLoader implements Closeable
+public class OwnClassLoader extends ClassLoader
 {
     private static final AtomicInteger nextId;
-    private static final Map<OwnClassLoader, Reference<OwnClassLoader>> weakReferenceMap;
-    private static final ReferenceQueue<OwnClassLoader> weakReferenceQueue;
 
     static
     {
         nextId = new AtomicInteger(1);
-        weakReferenceMap = new ConcurrentHashMap<>(10);
-        weakReferenceQueue = new ReferenceQueue<>();
     }
 
     private int id;
-    private FileSystem fileSystem;
     private Path basePath;
 
     public OwnClassLoader(ClassLoader parent)
@@ -60,9 +55,6 @@ public class OwnClassLoader extends ClassLoader implements Closeable
             URL baseURL = classLoader.getResource(".");
             URI baseURI = baseURL.toURI().resolve("../../out/production/OtherModule/");
             basePath = Paths.get(baseURI);
-            fileSystem = FileSystems.getDefault();
-            Reference<OwnClassLoader> reference = new WeakReference<>(this, weakReferenceQueue);
-            weakReferenceMap.put(this, reference);
         }
         catch (URISyntaxException e)
         {
@@ -74,67 +66,28 @@ public class OwnClassLoader extends ClassLoader implements Closeable
     @Override
     protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException
     {
-        try
+        synchronized (this.getClassLoadingLock(name))
         {
-            System.out.println("Own Class Loader loadClass - name " + name);
-            String classPathStr = name.replace('.', '/') + ".class";
-            Path classPath = basePath.resolve(classPathStr);
-            if(Files.notExists(classPath))
-                return super.loadClass(name, resolve);
-            byte[] classBytes = Files.readAllBytes(classPath);
-            Class<?> theClass = this.defineClass(name, classBytes, 0, classBytes.length);
-            return theClass == null ? super.loadClass(name, resolve) : theClass;
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
-    public void close() throws IOException
-    {
-        System.out.println("OwnClassLoader close");
-        try
-        {
-            if(fileSystem != null)
-                fileSystem.close();
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-        }
-    }
-
-    static
-    {
-        Thread cleanerThread = new Thread(new Cleaner(), "CleanerThread");
-        cleanerThread.setDaemon(true);
-        cleanerThread.start();
-    }
-
-    private static class Cleaner implements Runnable
-    {
-        @Override
-        public void run()
-        {
-            Reference<? extends OwnClassLoader> reference;
-            OwnClassLoader ownClassLoader;
-            while(true)
+            try
             {
-                try
-                {
-                    reference = weakReferenceQueue.remove();
-                    ownClassLoader = reference.get();
-                    weakReferenceMap.remove(ownClassLoader);
-                    ownClassLoader.close();
-                }
-                catch (InterruptedException | IOException e)
-                {
-                    e.printStackTrace();
-                }
+                System.out.println("Own Class Loader loadClass - name " + name);
+                String classPathStr = name.replace('.', '/') + ".class";
+                Path classPath = basePath.resolve(classPathStr);
+                if(Files.notExists(classPath))
+                    return super.loadClass(name, resolve);
+                byte[] classBytes = Files.readAllBytes(classPath);
+                Class<?> theClass = this.defineClass(name, classBytes, 0, classBytes.length);
+                if(theClass == null)
+                    return super.loadClass(name, resolve);
+                if(resolve)
+                    this.resolveClass(theClass);
+                return theClass;
             }
+            catch (IOException e)
+            {
+                e.printStackTrace();
+            }
+            return super.loadClass(name, resolve);
         }
     }
 }
