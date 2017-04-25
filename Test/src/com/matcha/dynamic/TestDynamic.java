@@ -1,9 +1,10 @@
 package com.matcha.dynamic;
 
+import com.matcha.dynamic.app.MethodObject;
+
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
-import java.lang.reflect.Method;
 
 /**
  * Created by Matcha on 2016/11/28.
