@@ -1,12 +1,20 @@
 package com.matcha.classloader;
 
+import sun.misc.Unsafe;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.ByteBuffer;
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -18,28 +26,27 @@ import java.security.ProtectionDomain;
  */
 public class OwnClassLoader2 extends ClassLoader
 {
-    private MethodHandle findBootstrapClassOrNullMethodHandle;
-    private MethodHandle getBootstrapResourceMethodHandle;
+    private Method findBootstrapClassOrNull;
+    private Method getBootstrapResource;
+    private Unsafe unsafe;
 
     public OwnClassLoader2()
     {
         try
         {
-            MethodHandles.Lookup lookup = MethodHandles.lookup();
-            MethodType findClassMethodType = MethodType.methodType(Class.class, String.class);
-            MethodType getResourceMethodType = MethodType.methodType(URL.class, String.class);
-            this.findBootstrapClassOrNullMethodHandle = lookup.findVirtual(
-                    ClassLoader.class,
-                    "findBootstrapClassOrNull",
-                    findClassMethodType
-            );
-            this.getBootstrapResourceMethodHandle = lookup.findVirtual(
-                    ClassLoader.class,
-                    "getBootstrapResource",
-                    getResourceMethodType
-            );
+            Class<ClassLoader> classLoaderClass = ClassLoader.class;
+            this.findBootstrapClassOrNull =
+                    classLoaderClass.getDeclaredMethod("findBootstrapClassOrNull", String.class);
+            this.findBootstrapClassOrNull.setAccessible(true);
+            this.getBootstrapResource = classLoaderClass.getDeclaredMethod("getBootstrapResource", String.class);
+            this.getBootstrapResource.setAccessible(true);
+
+            Class<Unsafe> unsafeClass = Unsafe.class;
+            Field unsafeField = unsafeClass.getDeclaredField("theUnsafe");
+            unsafeField.setAccessible(true);
+            this.unsafe = (Unsafe) unsafeField.get(null);
         }
-        catch (NoSuchMethodException | IllegalAccessException e)
+        catch (NoSuchMethodException | NoSuchFieldException | IllegalAccessException e)
         {
             e.printStackTrace();
             throw new RuntimeException(e);
@@ -56,16 +63,12 @@ public class OwnClassLoader2 extends ClassLoader
                 //Bootstrap ClassLoader中的类在这里是无法查询到的
                 //另一个方法findBootstrapClassOrNull在ClassLoader类中是私有的，无法调用
                 Class theClass = this.findLoadedClass(name);
-                if(theClass == null)
-                    theClass = (Class) this.findBootstrapClassOrNullMethodHandle.invoke(name);
-                if(theClass != null)
+                if (theClass == null)
+                    theClass = (Class) this.findBootstrapClassOrNull.invoke(this, name);
+                if (theClass != null)
                     return loadLoadedClass(name, resolve, theClass);
             }
-            catch (ClassNotFoundException e)
-            {
-
-            }
-            catch (Throwable throwable)
+            catch (ClassNotFoundException | IllegalAccessException | InvocationTargetException e)
             {
 
             }
@@ -88,7 +91,7 @@ public class OwnClassLoader2 extends ClassLoader
         try
         {
             String path = name.replace('.', '/') + ".class";
-            URL classURL = (URL) this.getBootstrapResourceMethodHandle.invoke(path);
+            URL classURL = (URL) this.getBootstrapResource.invoke(null, path);
             return loadClass(classURL, name, resolve);
         }
         catch (Throwable throwable)
@@ -109,22 +112,56 @@ public class OwnClassLoader2 extends ClassLoader
     {
         try
         {
-            if(location == null)
+            if (location == null)
             {
                 System.out.println("load loaded class fail");
                 throw new ClassNotFoundException();
             }
-            Path locationPath = Paths.get(location.toURI());
-            byte[] loadedClassBytes = Files.readAllBytes(locationPath);
-            Class<?> newClass = this.defineClass(name, loadedClassBytes, 0, loadedClassBytes.length);
-            if(resolve)
+            InputStream inputStream = location.openStream();
+            int available = inputStream.available();
+            ByteBuffer byteBuffer = ByteBuffer.allocateDirect(available);
+            ReadableByteChannel readableByteChannel = Channels.newChannel(inputStream);
+            readableByteChannel.read(byteBuffer);
+            byteBuffer.flip();
+            byte[] loadedClassBytes = new byte[available];
+            byteBuffer.get(loadedClassBytes);
+            Class<?> newClass = this.defineClass(name, loadedClassBytes);
+            if (resolve)
                 this.resolveClass(newClass);
             return newClass;
         }
-        catch (URISyntaxException | IOException e)
+        catch (IOException e)
         {
-            e.printStackTrace();
-            throw new ClassNotFoundException();
+            throw new RuntimeException(e);
         }
+    }
+
+    private Class<?> defineClass(String name, byte[] loadedClassBytes) throws ClassNotFoundException
+    {
+        try
+        {
+            return this.defineClass(name, loadedClassBytes, 0, loadedClassBytes.length);
+        }
+        catch (Throwable throwable)
+        {
+            throwable.printStackTrace();
+        }
+
+        try
+        {
+            return unsafe.defineClass(
+                    name,
+                    loadedClassBytes,
+                    0,
+                    loadedClassBytes.length,
+                    this,
+                    null
+            );
+        }
+        catch (Throwable throwable)
+        {
+            throwable.printStackTrace();
+        }
+        throw new ClassNotFoundException();
     }
 }
