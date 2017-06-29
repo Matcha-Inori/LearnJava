@@ -1,4 +1,4 @@
-package com.matcha.dynamic;
+package com.matcha.dynamic.app;
 
 /**
  * Created by Matcha on 2016/11/28.
