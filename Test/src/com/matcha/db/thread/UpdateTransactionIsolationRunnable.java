@@ -2,23 +2,25 @@ package com.matcha.db.thread;
 
 import com.matcha.db.ConnectionPool;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
+import java.util.Random;
 
 /**
- * Created by Administrator on 2017/6/30.
+ * Created by Matcha on 2017/7/1.
  */
-public class QueryTransactionIsolationRunnable implements Runnable
+public class UpdateTransactionIsolationRunnable implements Runnable
 {
     private ConnectionPool connectionPool;
     private int transactionIsolation;
+    private long updateDataId;
+    private String updateName;
 
-    public QueryTransactionIsolationRunnable(ConnectionPool connectionPool, int transactionIsolation)
+    public UpdateTransactionIsolationRunnable(ConnectionPool connectionPool, int transactionIsolation, long updateDataId, String updateName)
     {
         this.connectionPool = connectionPool;
         this.transactionIsolation = transactionIsolation;
+        this.updateDataId = updateDataId;
+        this.updateName = updateName;
     }
 
     @Override
@@ -26,27 +28,14 @@ public class QueryTransactionIsolationRunnable implements Runnable
     {
         Connection connection = null;
         Statement statement = null;
-        ResultSet resultSet = null;
         try
         {
+            String sql = String.format("UPDATE T_TEST SET FNAME = '%s' WHERE FID = %d", updateName, updateDataId);
             connection = connectionPool.getConnection();
             connection.setTransactionIsolation(transactionIsolation);
             connection.setAutoCommit(false);
             statement = connection.createStatement();
-            resultSet = statement.executeQuery("SELECT FID testId, FNAME testName, FNUMBER testNumber FROM T_TEST");
-            Thread currentThread = Thread.currentThread();
-            long testId;
-            String testName;
-            String testNumber;
-            String info;
-            while(resultSet.next())
-            {
-                testId = resultSet.getLong("testId");
-                testName = resultSet.getString("testName");
-                testNumber = resultSet.getString("testNumber");
-                info = String.format("%s : %s-%s-%s", currentThread.getName(), testId, testName, testNumber);
-                System.out.println(info);
-            }
+            statement.executeUpdate(sql);
             connection.commit();
         }
         catch (SQLException e)
@@ -63,15 +52,6 @@ public class QueryTransactionIsolationRunnable implements Runnable
         }
         finally
         {
-            try
-            {
-                if(resultSet != null)
-                    resultSet.close();
-            }
-            catch (SQLException e)
-            {
-            }
-
             try
             {
                 if(statement != null)

@@ -31,19 +31,22 @@ public final class ConnectionPoolBuilder
     {
     }
 
-    public void setDbConnectionUrl(String dbConnectionUrl)
+    public ConnectionPoolBuilder setDbConnectionUrl(String dbConnectionUrl)
     {
         this.dbConnectionUrl = dbConnectionUrl;
+        return this;
     }
 
-    public void setUserName(String userName)
+    public ConnectionPoolBuilder setUserName(String userName)
     {
         this.userName = userName;
+        return this;
     }
 
-    public void setPassword(String password)
+    public ConnectionPoolBuilder setPassword(String password)
     {
         this.password = password;
+        return this;
     }
 
     private String buildDbKey(String dbConnectionUrl, String userName)
@@ -58,13 +61,13 @@ public final class ConnectionPoolBuilder
         try
         {
             ConnectionPool connectionPool = connectionPoolMap.get(dbKey);
-            if(connectionPool == null) return connectionPool;
-            return buildConnectionPool();
+            if(connectionPool != null) return connectionPool;
         }
         finally
         {
             readLock.unlock();
         }
+        return buildConnectionPool();
     }
 
     private ConnectionPool buildConnectionPool()
@@ -73,7 +76,9 @@ public final class ConnectionPoolBuilder
         writeLock.lock();
         try
         {
-            ConnectionPool connectionPool =
+            ConnectionPool connectionPool = connectionPoolMap.get(dbKey);
+            if(connectionPool != null) return connectionPool;
+            connectionPool =
                     new ConnectionPool(dbConnectionUrl, userName, password, 5);
             connectionPoolMap.put(dbKey, connectionPool);
             return connectionPool;
