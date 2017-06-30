@@ -5,4 +5,8 @@ package com.matcha.db;
  */
 public class TestTransactionIsolation
 {
+    public static void main(String[] args)
+    {
+
+    }
 }
