@@ -12,6 +12,7 @@ public class TestProviderAndCustomer
     {
         try
         {
+            CountDownLatch countDownLatch = new CountDownLatch(3);
             Future<Integer>[] futures = new Future[3];
             BlockingQueue<Integer>[] blockingQueues = new BlockingQueue[3];
             MyThreadFactory threadFactory = new MyThreadFactory("My");
@@ -20,7 +21,7 @@ public class TestProviderAndCustomer
             for(int index = 0;index < 3;index++)
             {
                 blockingQueues[index] = queue = new LinkedBlockingQueue<>();
-                futures[index] = executorService.submit(new Customer(queue));
+                futures[index] = executorService.submit(new Customer(queue, countDownLatch));
             }
             int customerIndex;
             for(int index = 0;index < 300;index++)
@@ -29,6 +30,7 @@ public class TestProviderAndCustomer
                 queue = blockingQueues[customerIndex];
                 queue.offer(index + 1);
             }
+            countDownLatch.await();
             executorService.shutdown();
             threadFactory.destroyAllThread();
             int result = 0;
@@ -95,16 +97,19 @@ class MyThreadFactory implements ThreadFactory
 
 class Customer implements Callable<Integer>
 {
+    private CountDownLatch countDownLatch;
     private BlockingQueue<Integer> queue;
 
-    public Customer(BlockingQueue<Integer> queue)
+    public Customer(BlockingQueue<Integer> queue, CountDownLatch countDownLatch)
     {
         this.queue = queue;
+        this.countDownLatch = countDownLatch;
     }
 
     @Override
     public Integer call() throws Exception
     {
+        countDownLatch.countDown();
         boolean finish = false;
         int mission;
         int result = 0;
